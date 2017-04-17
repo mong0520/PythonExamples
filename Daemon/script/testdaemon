@@ -24,7 +24,7 @@ start() {
     echo "Starting server"
     # Start the daemon
     $python $program start
-    sleep 3
+    sleep 3 # in case the pid file is not generated
     ps -p `cat $service_pidfile >/dev/null 2>&1` >/dev/null 2>&1
     rc=$?
 }
@@ -37,12 +37,16 @@ stop() {
 
 status() {
     #checkpid `cat $service_pidfile 2>/dev/null`
-    ps -p `cat $service_pidfile` >/dev/null 2>&1
-    ret=$?
+    if [ -e $service_pidfile ]; then
+        ps -p `cat $service_pidfile` >/dev/null 2>&1
+        ret=$?
+    else
+        ret=1
+    fi
     if [ $ret = 0 ]; then
         echo "$service_name (`cat $service_pidfile`) is running"
     else
-        echo "$service_name does not exist"
+        echo "$service_name is not running"
     fi
 }
 
