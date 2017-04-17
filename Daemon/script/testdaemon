@@ -7,22 +7,30 @@ service_pidfile="/var/run/testdaemon.pid"
 python="python"
 program="/usr/share/testdaemon/testdaemon.py"
 
-case "$1" in
-  start)
-    echo "Starting server"
-    # Start the daemon 
+
+start() {
+    ps -p `cat $service_pidfile` >/dev/null 2>&1
+    ret=$?
+    if [ $ret = 0 ]; then
+        echo "$service_name (`cat $service_pidfile`) is already running..."
+        exit 1
+    fi
+    echo -n "Starting server"
+    # Start the daemon
     $python $program start
-    ;;
-  stop)
+    sleep 3
+    ps -p `cat $service_pidfile` >/dev/null 2>&1
+    rc=$?
+    echo
+}
+
+stop() {
     echo "Stopping server"
     # Stop the daemon
     $python $program stop
-    ;;
-  restart)
-    echo "Restarting server"
-    $python $program restart
-    ;;
-  status)
+}
+
+status() {
     #checkpid `cat $service_pidfile 2>/dev/null`
     ps -p `cat $service_pidfile` >/dev/null 2>&1
     ret=$?
@@ -32,12 +40,25 @@ case "$1" in
         echo "$service_name does not exist"
 
     fi
+}
+
+
+case "$1" in
+start)
+    start
     ;;
-  *)
-    # Refuse to do other stuff
-    echo "Usage: /etc/init.d/testdaemon.sh {start|stop|restart|status}"
-    exit 1
+stop)
+    stop
     ;;
+restart)
+    stop
+    start
+    ;;
+status)
+    status
+    ;;
+*)
+    echo "Usage: $0 {start|stop|restart|status}"
 esac
 
 exit 0

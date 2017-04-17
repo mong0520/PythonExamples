@@ -11,8 +11,10 @@ class App():
 
     def __init__(self):
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/tty'
-        self.stderr_path = '/dev/tty'
+        self.stdout_path = '/dev/null'
+        self.stderr_path = '/dev/null'
+        # self.stdout_path = '/dev/tty'
+        # self.stderr_path = '/dev/tty'
         self.pidfile_path =  '/var/run/testdaemon.pid'
         self.pidfile_timeout = 5
 
@@ -37,5 +39,8 @@ logger.addHandler(handler)
 daemon_runner = runner.DaemonRunner(app)
 #This ensures that the logger file handle does not get closed during daemonization
 daemon_runner.daemon_context.files_preserve=[handler.stream]
-daemon_runner.do_action()
-
+try:
+    daemon_runner.do_action()
+except Exception as e:
+    logger.error(e)
+    
