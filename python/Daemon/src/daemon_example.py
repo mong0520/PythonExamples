@@ -28,6 +28,10 @@ class App():
             logger.error("Error message")
             time.sleep(10)
 
+            
+def program_cleanup(signum, frame):
+    logger.debug('Shutdown')
+    
 app = App()
 logger = logging.getLogger("DaemonLog")
 logger.setLevel(logging.INFO)
@@ -37,6 +41,12 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 daemon_runner = runner.DaemonRunner(app)
+
+# Override signal map, seems not a good way.
+daemon_runner.daemon_context.signal_map = {
+    signal.SIGTERM: programCleanup,
+    signal.SIGHUP: programCleanup
+}
 #This ensures that the logger file handle does not get closed during daemonization
 daemon_runner.daemon_context.files_preserve=[handler.stream]
 try:
