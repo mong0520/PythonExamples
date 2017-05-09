@@ -44,8 +44,8 @@ daemon_runner = runner.DaemonRunner(app)
 
 # Override signal map, seems not a good way.
 daemon_runner.daemon_context.signal_map = {
-    signal.SIGTERM: programCleanup,
-    signal.SIGHUP: programCleanup
+    signal.SIGTERM: program_cleanup,
+    signal.SIGHUP: program_cleanup
 }
 #This ensures that the logger file handle does not get closed during daemonization
 daemon_runner.daemon_context.files_preserve=[handler.stream]
